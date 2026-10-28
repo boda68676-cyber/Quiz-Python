@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>موقع الاختبارات</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 30px 15px;
+    }
+    .quiz {
+      max-width: 550px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px #0001;
+    }
+    h1 { color: #175cd3; }
+    .option {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      border: 1px solid #ccd5e0;
+      border-radius: 9px;
+      background: white;
+      cursor: pointer;
+      text-align: right;
+      font-size: 17px;
+    }
+    .option:hover { background: #edf4ff; }
+    #message { font-weight: bold; }
+    #next {
+      display: none;
+      padding: 12px 22px;
+      background: #175cd3;
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz">
+    <h1>اختبارك</h1>
+    <p id="progress"></p>
+    <h3 id="question"></h3>
+    <div id="options"></div>
+    <p id="message"></p>
+    <button id="next" onclick="nextQuestion()">
+      السؤال التالي
+    </button>
+  </div>
+
+  <script>
+    // أضف أسئلتك هنا
+    const questions = [
+      {
+        q: "كم يساوي 5 × 4؟",
+        options: ["15", "20", "25", "10"],
+        answer: 1
+      },
+      {
+        q: "كم يساوي 10 + 7؟",
+        options: ["15", "16", "17", "18"],
+        answer: 2
+      },
+      {
+        q: "كم عدد أيام الأسبوع؟",
+        options: ["5", "6", "7", "8"],
+        answer: 2
+      }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let answered = false;
+
+    function showQuestion() {
+      answered = false;
+      document.getElementById("message").textContent = "";
+      document.getElementById("next").style.display = "none";
+      document.getElementById("progress").textContent =
+        `السؤال ${current + 1} من ${questions.length}`;
+
+      const item = questions[current];
+      document.getElementById("question").textContent = item.q;
+      const box = document.getElementById("options");
+      box.innerHTML = "";
+
+      item.options.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.className = "option";
+        button.textContent = option;
+        button.onclick = () => checkAnswer(index);
+        box.appendChild(button);
+      });
+    }
+
+    function checkAnswer(index) {
+      if (answered) return;
+
+      const item = questions[current];
+      const message = document.getElementById("message");
+
+      if (index === item.answer) {
+        answered = true;
+        score++;
+        message.textContent = "✅ إجابة صحيحة!";
+        message.style.color = "green";
+
+        if (current === questions.length - 1) {
+          document.getElementById("next").textContent =
+            "عرض النتيجة";
+        } else {
+          document.getElementById("next").textContent =
+            "السؤال التالي";
+        }
+
+        document.getElementById("next").style.display = "inline-block";
+      } else {
+        message.textContent = "❌ إجابة غلط، حاول تاني.";
+        message.style.color = "red";
+      }
+    }
+
+    function nextQuestion() {
+      if (!answered) return;
+
+      current++;
+
+      if (current < questions.length) {
+        showQuestion();
+      } else {
+        document.querySelector(".quiz").innerHTML = `
+          <h1>انتهى الاختبار 🎉</h1>
+          <h2>نتيجتك: ${score} من ${questions.length}</h2>
+          <button class="option" onclick="location.reload()">
+            إعادة الاختبار
+          </button>
+        `;
+      }
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>
